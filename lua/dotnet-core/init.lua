@@ -121,13 +121,15 @@ function M.setup(user_config)
   -- Set up keymaps if enabled
   if state.config.keymaps.enable_default then
     require('dotnet-core.keymaps').setup(state.config.keymaps)
+    -- Also set up keymap autocommands for buffer-local keymaps
+    require('dotnet-core.keymaps').setup_autocommands()
   end
-  
+
   -- Auto-detect .NET projects
   if state.config.project.auto_detect_solution then
     M.detect_project()
   end
-  
+
   -- Set up autocommands
   M.setup_autocommands()
   

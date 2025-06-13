@@ -30,31 +30,31 @@ end
 -- Create keymaps for dotnet CLI commands
 function M.create_dotnet_keymaps(leader, mappings)
   local opts = { noremap = true, silent = true, desc = "" }
-  
+
   -- Build commands
   if mappings.build then
     opts.desc = "Build .NET project/solution"
     vim.keymap.set('n', leader .. mappings.build, '<cmd>DotnetCoreBuild<cr>', opts)
   end
-  
+
   -- Run commands
   if mappings.run then
     opts.desc = "Run .NET project"
     vim.keymap.set('n', leader .. mappings.run, '<cmd>DotnetCoreRun<cr>', opts)
   end
-  
+
   -- Test commands
   if mappings.test then
     opts.desc = "Run .NET tests"
     vim.keymap.set('n', leader .. mappings.test, '<cmd>DotnetCoreTest<cr>', opts)
   end
-  
+
   -- Restore packages
   if mappings.restore then
     opts.desc = "Restore NuGet packages"
     vim.keymap.set('n', leader .. mappings.restore, '<cmd>DotnetCoreRestore<cr>', opts)
   end
-  
+
   -- Clean
   if mappings.clean then
     opts.desc = "Clean .NET project/solution"
