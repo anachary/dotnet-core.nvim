@@ -165,7 +165,7 @@ The plugin automatically configures OmniSharp for rich C# language support:
 - **Find references**: `gr`
 - **Hover information**: `K`
 - **Rename symbol**: `<F2>`
-- **Code actions**: `<leader>dca`
+- **Code actions**: `<leader>ca`
 
 ## Configuration
 
@@ -214,7 +214,7 @@ require("dotnet-core").setup({
   -- Keybindings
   keymaps = {
     enable_default = true,
-    leader = "<leader>d", -- Prefix for dotnet commands
+    leader = "<leader>", -- Direct leader access for speed
     mappings = {
       build = "b",
       run = "r",
@@ -238,7 +238,7 @@ require("dotnet-core").setup({
 ```lua
 require("dotnet-core").setup({
   keymaps = {
-    leader = "<leader>n", -- Use <leader>n instead of <leader>d
+    leader = "<leader>", -- Use direct leader for fastest access
   },
 })
 ```
@@ -307,38 +307,41 @@ require("dotnet-core").setup({
 
 ## Keybindings
 
-All keybindings use `<leader>d` as the prefix by default (configurable).
+**Super fast shortcuts!** Most common actions are single key presses. All keybindings are configurable.
 
-### Build & Run
-- `<leader>db` - Build project/solution
-- `<leader>dr` - Run project
-- `<leader>dt` - Run tests
-- `<leader>dR` - Restore packages
-- `<leader>dc` - Clean
+### Build & Run (Single Key - Super Fast! ⚡)
+- `<leader>b` - **B**uild project/solution
+- `<leader>r` - **R**un project
+- `<leader>t` - **T**est
+- `<leader>c` - **C**lean
+- `<leader>pr` - **P**ackage **R**estore
 
-### Build Configurations
-- `<leader>dbd` - Build Debug
-- `<leader>dbr` - Build Release
-- `<leader>drd` - Run Debug
-- `<leader>drr` - Run Release
+### Build Configurations (Two Keys)
+- `<leader>bd` - **B**uild **D**ebug
+- `<leader>br` - **B**uild **R**elease
+- `<leader>rd` - **R**un **D**ebug
+- `<leader>rr` - **R**un **R**elease
 
-### Code Navigation
-- `<leader>dfr` - Find references
-- `<leader>dgi` - Go to implementation
-- `<leader>drn` - Rename symbol
-- `<leader>dca` - Code actions
+### Code Navigation (Two Keys)
+- `<leader>fr` - **F**ind **R**eferences
+- `<leader>gi` - **G**o to **I**mplementation
+- `<leader>rn` - **R**e**n**ame symbol
+- `<leader>ca` - **C**ode **A**ctions
 - `gd` - Go to definition (buffer-local)
 - `gr` - Find references (buffer-local)
 - `gi` - Go to implementation (buffer-local)
 - `<F2>` - Rename (buffer-local)
 
-### Project Management
-- `<leader>dse` - Solution explorer
-- `<leader>dps` - Project structure
-- `<leader>dnp` - New project
-- `<leader>dns` - New solution
-- `<leader>dap` - Add package
-- `<leader>drp` - Remove package
+### Project Management (Two Keys)
+- `<leader>se` - **S**olution **E**xplorer
+- `<leader>ps` - **P**roject **S**tructure
+- `<leader>np` - **N**ew **P**roject
+- `<leader>ns` - **N**ew **S**olution
+- `<leader>pa` - **P**ackage **A**dd
+- `<leader>pd` - **P**ackage **D**elete
+
+### Utility (Single Key)
+- `<leader>h` - **H**ealth check
 
 ### Quick Actions
 - `<F5>` - Run project (buffer-local)

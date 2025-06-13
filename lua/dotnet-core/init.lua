@@ -7,6 +7,20 @@ local M = {}
 local default_config = {
   -- LSP configuration
   lsp = {
+    -- Language server type: "auto", "roslyn", "csharp_ls", or "omnisharp"
+    server_type = "auto", -- Auto-detect best available server
+
+    -- Roslyn Language Server (Microsoft's official - fastest and most reliable)
+    roslyn = {
+      cmd = { "Microsoft.CodeAnalysis.LanguageServer" },
+    },
+
+    -- csharp-ls (lightweight alternative)
+    csharp_ls = {
+      cmd = { "csharp-ls" },
+    },
+
+    -- OmniSharp (traditional option)
     omnisharp = {
       cmd = { "omnisharp", "--languageserver", "--hostPID", tostring(vim.fn.getpid()) },
       enable_roslyn_analyzers = true,
@@ -46,19 +60,26 @@ local default_config = {
   -- Keybindings
   keymaps = {
     enable_default = true,
-    leader = "<leader>d", -- Prefix for dotnet commands
+    leader = "<leader>", -- Direct leader access for speed
     mappings = {
-      build = "b",
-      run = "r",
-      test = "t",
-      restore = "R",
-      clean = "c",
-      find_references = "fr",
-      go_to_implementation = "gi",
-      rename = "rn",
-      code_action = "ca",
-      solution_explorer = "se",
-      project_structure = "ps",
+      -- Single key shortcuts (super fast!)
+      build = "b",           -- <leader>b - Build (most common)
+      run = "r",             -- <leader>r - Run (most common)
+      test = "t",            -- <leader>t - Test
+      clean = "c",           -- <leader>c - Clean
+
+      -- Two key shortcuts for less common actions
+      restore = "pr",        -- <leader>pr - Package Restore
+      find_references = "fr", -- <leader>fr - Find References
+      go_to_implementation = "gi", -- <leader>gi - Go Implementation
+      rename = "rn",         -- <leader>rn - Rename
+      code_action = "ca",    -- <leader>ca - Code Action
+      solution_explorer = "se", -- <leader>se - Solution Explorer
+      project_structure = "ps", -- <leader>ps - Project Structure
+      new_project = "np",    -- <leader>np - New Project
+      add_package = "pa",    -- <leader>pa - Package Add
+      remove_package = "pd", -- <leader>pd - Package Delete
+      health = "h",          -- <leader>h - Health check
     },
   },
   

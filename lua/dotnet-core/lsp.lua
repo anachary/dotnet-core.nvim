@@ -10,34 +10,51 @@ local lsp_attached_buffers = {}
 
 -- Setup LSP configuration
 function M.setup(lsp_config)
-  -- Configure OmniSharp LSP
   local lspconfig = require('lspconfig')
-  
-  -- Get the LSP configuration from our config module
-  local omnisharp_config = config.get_lsp_config()
-  
+
+  -- Determine which language server to use
+  local server_type = lsp_config.server_type or "auto"
+  local server_config = {}
+
   -- Enhanced capabilities for better .NET Core support
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   capabilities.textDocument.completion.completionItem.snippetSupport = true
   capabilities.textDocument.completion.completionItem.resolveSupport = {
     properties = { "documentation", "detail", "additionalTextEdits" }
   }
-  
-  -- Add custom handlers for better .NET Core experience
-  omnisharp_config.handlers = {
-    ["textDocument/definition"] = M.enhanced_go_to_definition,
-    ["textDocument/references"] = M.enhanced_find_references,
-    ["textDocument/implementation"] = M.enhanced_go_to_implementation,
-    ["textDocument/codeAction"] = M.enhanced_code_action,
-  }
-  
-  omnisharp_config.capabilities = capabilities
-  omnisharp_config.on_attach = M.on_attach
-  
-  -- Setup OmniSharp
-  lspconfig.omnisharp.setup(omnisharp_config)
-  
-  utils.info("LSP configuration loaded for OmniSharp")
+
+  -- Auto-detect best available language server
+  if server_type == "auto" then
+    if utils.command_exists("Microsoft.CodeAnalysis.LanguageServer") then
+      server_type = "roslyn"
+    elseif utils.command_exists("csharp-ls") then
+      server_type = "csharp_ls"
+    elseif utils.command_exists("omnisharp") then
+      server_type = "omnisharp"
+    else
+      utils.warn("No C# language server found. Install one of: Roslyn, csharp-ls, or OmniSharp")
+      return
+    end
+  end
+
+  -- Configure based on server type
+  if server_type == "roslyn" then
+    server_config = M.get_roslyn_config(lsp_config)
+    lspconfig.roslyn.setup(server_config)
+    utils.info("LSP configuration loaded for Roslyn Language Server")
+  elseif server_type == "csharp_ls" then
+    server_config = M.get_csharp_ls_config(lsp_config)
+    lspconfig.csharp_ls.setup(server_config)
+    utils.info("LSP configuration loaded for csharp-ls")
+  elseif server_type == "omnisharp" then
+    server_config = config.get_lsp_config()
+    lspconfig.omnisharp.setup(server_config)
+    utils.info("LSP configuration loaded for OmniSharp")
+  end
+
+  -- Add common configuration
+  server_config.capabilities = capabilities
+  server_config.on_attach = M.on_attach
 end
 
 -- Enhanced on_attach function for .NET Core specific features
@@ -278,6 +295,49 @@ function M.get_client_info()
     return vim.lsp.get_client_by_id(lsp_client_id)
   end
   return nil
+end
+
+-- Get Roslyn Language Server configuration (Microsoft's official, fastest)
+function M.get_roslyn_config(lsp_config)
+  return {
+    cmd = { "Microsoft.CodeAnalysis.LanguageServer" },
+    filetypes = { "cs" },
+    root_dir = function(fname)
+      local util = require('lspconfig.util')
+      return util.root_pattern("*.sln", "*.csproj", ".git")(fname)
+    end,
+    settings = {
+      ["csharp|inlay_hints"] = {
+        csharp_enable_inlay_hints_for_implicit_object_creation = true,
+        csharp_enable_inlay_hints_for_implicit_variable_types = true,
+        csharp_enable_inlay_hints_for_lambda_parameter_types = true,
+        csharp_enable_inlay_hints_for_types = true,
+        dotnet_enable_inlay_hints_for_indexer_parameters = true,
+        dotnet_enable_inlay_hints_for_literal_parameters = true,
+        dotnet_enable_inlay_hints_for_object_creation_parameters = true,
+        dotnet_enable_inlay_hints_for_other_parameters = true,
+        dotnet_enable_inlay_hints_for_parameters = true,
+        dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
+        dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
+        dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
+      },
+    },
+  }
+end
+
+-- Get csharp-ls configuration (lightweight alternative)
+function M.get_csharp_ls_config(lsp_config)
+  return {
+    cmd = { "csharp-ls" },
+    filetypes = { "cs" },
+    root_dir = function(fname)
+      local util = require('lspconfig.util')
+      return util.root_pattern("*.sln", "*.csproj", ".git")(fname)
+    end,
+    init_options = {
+      AutomaticWorkspaceInit = true,
+    },
+  }
 end
 
 return M

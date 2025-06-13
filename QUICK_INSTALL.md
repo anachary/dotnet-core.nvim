@@ -27,7 +27,7 @@ Add this to your `lazy.nvim` plugin list in `init.lua`:
     require("dotnet-core").setup({
       keymaps = {
         enable_default = true,
-        leader = "<leader>d", -- Use <leader>d prefix
+        leader = "<leader>", -- Direct leader for speed
       },
       dotnet = {
         auto_restore = true,
@@ -39,13 +39,14 @@ Add this to your `lazy.nvim` plugin list in `init.lua`:
 },
 ```
 
-## 🎯 Key Commands
+## 🎯 Key Commands (Super Fast! ⚡)
 
 - `:DotnetCoreHealth` - Check plugin status
-- `<leader>db` - Build project
-- `<leader>dr` - Run project
-- `<leader>dse` - Solution explorer
-- `<leader>dnp` - New project
+- `<leader>b` - Build project (1 key!)
+- `<leader>r` - Run project (1 key!)
+- `<leader>t` - Test (1 key!)
+- `<leader>se` - Solution explorer
+- `<leader>np` - New project
 
 ## 📋 Next Steps
 
