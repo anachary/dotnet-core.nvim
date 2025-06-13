@@ -79,6 +79,7 @@ local default_config = {
       new_project = "np",    -- <leader>np - New Project
       add_package = "pa",    -- <leader>pa - Package Add
       remove_package = "pd", -- <leader>pd - Package Delete
+      startup_project = "sp", -- <leader>sp - Select Startup Project
       health = "h",          -- <leader>h - Health check
     },
   },
@@ -95,6 +96,8 @@ local default_config = {
     auto_detect_solution = true,
     show_hidden_files = false,
     group_by_project = true,
+    auto_detect_startup_project = true, -- Automatically detect executable projects as startup
+    startup_project = nil, -- Path to the startup project (auto-detected or manually set)
   },
 }
 
@@ -104,6 +107,7 @@ local state = {
   lsp_attached = false,
   current_solution = nil,
   current_project = nil,
+  startup_project = nil, -- The project to run when using run commands
 }
 
 -- Setup function

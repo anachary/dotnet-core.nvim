@@ -187,7 +187,8 @@ function M.populate_explorer()
     
     -- Add projects from solution
     for _, project in ipairs(current_solution.projects) do
-      table.insert(lines, "  " .. (icons.project or "📦") .. " " .. project.name)
+      local startup_marker = M.is_startup_project(project.path) and " ⭐" or ""
+      table.insert(lines, "  " .. (icons.project or "📦") .. " " .. project.name .. startup_marker)
     end
   else
     table.insert(lines, "📁 Workspace")
@@ -213,7 +214,8 @@ function M.populate_explorer()
       end
       
       if not is_in_solution then
-        table.insert(lines, "  " .. (icons.project or "📦") .. " " .. project.name)
+        local startup_marker = M.is_startup_project(project.path) and " ⭐" or ""
+        table.insert(lines, "  " .. (icons.project or "📦") .. " " .. project.name .. startup_marker)
         table.insert(lines, "    Target: " .. (project.target_framework or "Unknown"))
         table.insert(lines, "    Type: " .. project.output_type)
         
@@ -289,6 +291,11 @@ function M.setup_explorer_keymaps()
   -- Run project under cursor
   vim.keymap.set('n', 'R', function()
     M.run_project_under_cursor()
+  end, opts)
+
+  -- Set project under cursor as startup project
+  vim.keymap.set('n', 's', function()
+    M.set_startup_project_under_cursor()
   end, opts)
 end
 
@@ -426,6 +433,43 @@ end
 -- Get current solution information
 function M.get_current_solution()
   return current_solution
+end
+
+-- Check if a project is the startup project
+function M.is_startup_project(project_path)
+  local dotnet = require('dotnet-core.dotnet')
+  local startup = dotnet.get_startup_project()
+  return startup and startup == project_path
+end
+
+-- Add keymap to set startup project in solution explorer
+function M.setup_startup_project_keymaps()
+  if not explorer_buffer then
+    return
+  end
+
+  local opts = { noremap = true, silent = true, buffer = explorer_buffer }
+
+  -- Set project under cursor as startup project
+  vim.keymap.set('n', 's', function()
+    M.set_startup_project_under_cursor()
+  end, opts)
+end
+
+-- Set project under cursor as startup project
+function M.set_startup_project_under_cursor()
+  local line = vim.api.nvim_get_current_line()
+  local project_name = line:match("📦 ([^⭐]+)")  -- Extract name without startup marker
+
+  if project_name then
+    project_name = vim.trim(project_name)  -- Remove any trailing spaces
+    local project = M.find_project_by_name(project_name)
+    if project then
+      require('dotnet-core.dotnet').set_startup_project(project.path)
+      -- Refresh the explorer to show the new startup project marker
+      M.populate_explorer()
+    end
+  end
 end
 
 return M

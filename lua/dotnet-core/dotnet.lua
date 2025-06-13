@@ -7,6 +7,7 @@ local config = require('dotnet-core.config')
 -- Dotnet CLI state
 local current_project = nil
 local current_solution = nil
+local startup_project = nil
 local build_output_buffer = nil
 
 -- Setup dotnet CLI integration
@@ -79,19 +80,19 @@ end
 
 -- Run the current project
 function M.run(configuration)
-  local target = current_project
+  local target = M.get_startup_project()
   if not target then
-    utils.error("No .NET project found")
+    utils.error("No startup project found. Use :DotnetCoreSelectStartupProject to set one.")
     return
   end
-  
+
   local dotnet_config = config.get_dotnet_config()
   configuration = configuration or dotnet_config.default_configuration or "Debug"
-  
+
   local cmd = { "dotnet", "run", "--project", target, "--configuration", configuration }
-  
+
   utils.info("Running " .. vim.fn.fnamemodify(target, ":t") .. "...")
-  
+
   -- Run in a terminal for interactive applications
   M.execute_dotnet_command_in_terminal(cmd)
 end
@@ -296,13 +297,13 @@ end
 -- Watch for file changes and auto-restore if enabled
 function M.setup_auto_restore()
   local dotnet_config = config.get_dotnet_config()
-  
+
   if not dotnet_config.auto_restore then
     return
   end
-  
+
   local group = vim.api.nvim_create_augroup("DotnetAutoRestore", { clear = true })
-  
+
   vim.api.nvim_create_autocmd({ "BufWritePost" }, {
     group = group,
     pattern = { "*.csproj", "*.fsproj", "*.vbproj", "*.sln" },
@@ -311,6 +312,143 @@ function M.setup_auto_restore()
       M.restore()
     end,
   })
+end
+
+-- Get the startup project (the project to run)
+function M.get_startup_project()
+  if startup_project then
+    return startup_project
+  end
+
+  -- Auto-detect startup project if enabled
+  local project_config = config.get_project_config()
+  if project_config.auto_detect_startup_project then
+    local executable_projects = M.get_executable_projects()
+    if #executable_projects > 0 then
+      startup_project = executable_projects[1].path
+      utils.info("Auto-detected startup project: " .. vim.fn.fnamemodify(startup_project, ":t"))
+      return startup_project
+    end
+  end
+
+  -- Fallback to current project
+  return current_project
+end
+
+-- Set the startup project
+function M.set_startup_project(project_path)
+  if not project_path or not vim.fn.filereadable(project_path) then
+    utils.error("Invalid project path: " .. (project_path or "nil"))
+    return false
+  end
+
+  -- Verify it's an executable project
+  local project_info = utils.parse_csproj(project_path)
+  if project_info.output_type ~= "Exe" then
+    utils.warn("Project " .. vim.fn.fnamemodify(project_path, ":t") .. " is not executable (OutputType: " .. project_info.output_type .. ")")
+  end
+
+  startup_project = project_path
+  utils.info("Startup project set to: " .. vim.fn.fnamemodify(project_path, ":t"))
+  return true
+end
+
+-- Get all executable projects in the solution/workspace
+function M.get_executable_projects()
+  local executable_projects = {}
+  local cwd = vim.fn.getcwd()
+
+  -- Find all project files
+  local proj_files = utils.find_files(cwd, "*.csproj")
+
+  for _, proj_file in ipairs(proj_files) do
+    local project_info = utils.parse_csproj(proj_file)
+    if project_info and project_info.output_type == "Exe" then
+      table.insert(executable_projects, {
+        name = project_info.name or vim.fn.fnamemodify(proj_file, ":t:r"),
+        path = proj_file,
+        target_framework = project_info.target_framework,
+        output_type = project_info.output_type,
+      })
+    end
+  end
+
+  return executable_projects
+end
+
+-- Show startup project selection UI
+function M.select_startup_project()
+  local executable_projects = M.get_executable_projects()
+
+  if #executable_projects == 0 then
+    utils.warn("No executable projects found in the current workspace")
+    return
+  end
+
+  if #executable_projects == 1 then
+    M.set_startup_project(executable_projects[1].path)
+    return
+  end
+
+  -- Create selection list
+  local items = {}
+  for i, project in ipairs(executable_projects) do
+    local current_marker = (project.path == startup_project) and " (current)" or ""
+    table.insert(items, string.format("%d. %s%s", i, project.name, current_marker))
+  end
+
+  vim.ui.select(items, {
+    prompt = "Select startup project:",
+    format_item = function(item)
+      return item
+    end,
+  }, function(choice, idx)
+    if choice and idx then
+      M.set_startup_project(executable_projects[idx].path)
+    end
+  end)
+end
+
+-- Run a specific project (used by solution explorer)
+function M.run_specific_project(project_path, configuration)
+  if not project_path or not vim.fn.filereadable(project_path) then
+    utils.error("Invalid project path")
+    return
+  end
+
+  local dotnet_config = config.get_dotnet_config()
+  configuration = configuration or dotnet_config.default_configuration or "Debug"
+
+  local cmd = { "dotnet", "run", "--project", project_path, "--configuration", configuration }
+
+  utils.info("Running " .. vim.fn.fnamemodify(project_path, ":t") .. "...")
+
+  -- Run in a terminal for interactive applications
+  M.execute_dotnet_command_in_terminal(cmd)
+end
+
+-- Build a specific project (used by solution explorer)
+function M.build_specific_project(project_path, configuration)
+  if not project_path or not vim.fn.filereadable(project_path) then
+    utils.error("Invalid project path")
+    return
+  end
+
+  local dotnet_config = config.get_dotnet_config()
+  configuration = configuration or dotnet_config.default_configuration or "Debug"
+
+  local cmd = { "dotnet", "build", project_path, "--configuration", configuration }
+
+  utils.info("Building " .. vim.fn.fnamemodify(project_path, ":t") .. " (" .. configuration .. ")...")
+
+  M.execute_dotnet_command(cmd, function(exit_code, output)
+    if exit_code == 0 then
+      utils.info("Build succeeded")
+    else
+      utils.error("Build failed")
+      M.show_build_output(output)
+    end
+  end)
 end
 
 return M

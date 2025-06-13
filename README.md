@@ -279,10 +279,14 @@ require("dotnet-core").setup({
 
 ### Build & Run
 - `:DotnetCoreBuild [config]` - Build project/solution ✅
-- `:DotnetCoreRun [config]` - Run the project ✅
+- `:DotnetCoreRun [config]` - Run the startup project ✅
 - `:DotnetCoreTest [config]` - Run tests ✅
 - `:DotnetCoreRestore` - Restore NuGet packages ✅
 - `:DotnetCoreClean [config]` - Clean build artifacts ✅
+
+### Startup Project Management
+- `:DotnetCoreSelectStartupProject` - Select which project to run ✅
+- `:DotnetCoreSetStartupProject [path]` - Set specific project as startup ✅
 
 ### Code Navigation & LSP
 - `:DotnetCoreFindReferences` - Find all references to symbol ✅
@@ -335,6 +339,7 @@ require("dotnet-core").setup({
 ### Project Management (Two Keys)
 - `<leader>se` - **S**olution **E**xplorer
 - `<leader>ps` - **P**roject **S**tructure
+- `<leader>sp` - **S**tartup **P**roject selection
 - `<leader>np` - **N**ew **P**roject
 - `<leader>ns` - **N**ew **S**olution
 - `<leader>pa` - **P**ackage **A**dd
@@ -380,8 +385,28 @@ The solution explorer provides a tree view of your .NET solution:
 - `<CR>` or `o` - Open item under cursor
 - `b` - Build project under cursor
 - `R` - Run project under cursor (if executable)
+- `s` - Set project under cursor as startup project
 - `r` - Refresh explorer
 - `q` or `<Esc>` - Close explorer
+
+## 🚀 Startup Project Management
+
+When working with solutions containing multiple executable projects, you can specify which project should be run:
+
+### Automatic Detection
+- Automatically detects executable projects (OutputType: Exe)
+- Sets the first executable project as startup by default
+- Shows startup project with ⭐ marker in Solution Explorer
+
+### Manual Selection
+- Use `:DotnetCoreSelectStartupProject` to choose from available projects
+- Use `<leader>sp` for quick access
+- In Solution Explorer, press `s` on any executable project to set it as startup
+
+### Commands
+- `:DotnetCoreSelectStartupProject` - Interactive project selection
+- `:DotnetCoreSetStartupProject [path]` - Set specific project by path
+- `:DotnetCoreRun` - Always runs the current startup project
 
 ## Troubleshooting
 

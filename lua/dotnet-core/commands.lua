@@ -124,14 +124,39 @@ function M.create_commands()
   vim.api.nvim_create_user_command('DotnetCoreDebugStart', function()
     require('dotnet-core.debug').start()
   end, { desc = 'Start debugging the current project' })
-  
+
   vim.api.nvim_create_user_command('DotnetCoreDebugStop', function()
     require('dotnet-core.debug').stop()
   end, { desc = 'Stop debugging' })
-  
+
   vim.api.nvim_create_user_command('DotnetCoreDebugToggleBreakpoint', function()
     require('dotnet-core.debug').toggle_breakpoint()
   end, { desc = 'Toggle breakpoint at current line' })
+
+  -- Startup project commands
+  vim.api.nvim_create_user_command('DotnetCoreSelectStartupProject', function()
+    require('dotnet-core.dotnet').select_startup_project()
+  end, { desc = 'Select which project to run as startup project' })
+
+  vim.api.nvim_create_user_command('DotnetCoreSetStartupProject', function(opts)
+    if opts.args == "" then
+      require('dotnet-core.dotnet').select_startup_project()
+    else
+      require('dotnet-core.dotnet').set_startup_project(opts.args)
+    end
+  end, {
+    desc = 'Set startup project by path or show selection UI',
+    nargs = '?',
+    complete = function()
+      local dotnet = require('dotnet-core.dotnet')
+      local projects = dotnet.get_executable_projects()
+      local paths = {}
+      for _, project in ipairs(projects) do
+        table.insert(paths, project.path)
+      end
+      return paths
+    end
+  })
 end
 
 -- Create a new .NET project

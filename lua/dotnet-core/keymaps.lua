@@ -142,26 +142,32 @@ function M.create_project_keymaps(leader, mappings)
     opts.desc = "Open solution explorer"
     vim.keymap.set('n', leader .. mappings.solution_explorer, '<cmd>DotnetCoreSolutionExplorer<cr>', opts)
   end
-  
+
   -- Project structure
   if mappings.project_structure then
     opts.desc = "Show project structure"
     vim.keymap.set('n', leader .. mappings.project_structure, '<cmd>DotnetCoreProjectStructure<cr>', opts)
   end
+
+  -- Startup project selection
+  if mappings.startup_project then
+    opts.desc = "Select startup project"
+    vim.keymap.set('n', leader .. mappings.startup_project, '<cmd>DotnetCoreSelectStartupProject<cr>', opts)
+  end
   
   -- Additional project management keymaps
   opts.desc = "Create new project"
   vim.keymap.set('n', leader .. 'np', '<cmd>DotnetCoreNewProject<cr>', opts)
-  
+
   opts.desc = "Create new solution"
   vim.keymap.set('n', leader .. 'ns', '<cmd>DotnetCoreNewSolution<cr>', opts)
-  
+
   opts.desc = "Add NuGet package"
   vim.keymap.set('n', leader .. 'ap', '<cmd>DotnetCoreAddPackage<cr>', opts)
-  
+
   opts.desc = "Remove NuGet package"
   vim.keymap.set('n', leader .. 'rp', '<cmd>DotnetCoreRemovePackage<cr>', opts)
-  
+
   opts.desc = "Check plugin health"
   vim.keymap.set('n', leader .. 'h', '<cmd>DotnetCoreHealth<cr>', opts)
 end
