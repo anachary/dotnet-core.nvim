@@ -170,6 +170,19 @@ function M.create_project_keymaps(leader, mappings)
 
   opts.desc = "Check plugin health"
   vim.keymap.set('n', leader .. 'h', '<cmd>DotnetCoreHealth<cr>', opts)
+
+  -- === GLOBAL VISUAL STUDIO STYLE KEYMAPS ===
+
+  -- Solution Explorer (VS: Ctrl+Alt+L) - Alternative: Ctrl+E
+  opts.desc = "Solution Explorer (VS: Ctrl+Alt+L) - Alternative: Ctrl+E"
+  vim.keymap.set('n', '<C-e>', '<cmd>DotnetCoreSolutionExplorer<cr>', opts)
+
+  -- Build shortcuts (global, work in any buffer)
+  opts.desc = "Build Solution (VS: Ctrl+Shift+B)"
+  vim.keymap.set('n', '<C-S-B>', '<cmd>DotnetCoreBuild<cr>', opts)
+
+  opts.desc = "Rebuild Solution (VS: Ctrl+Alt+F7)"
+  vim.keymap.set('n', '<C-A-F7>', '<cmd>DotnetCoreClean<cr><cmd>DotnetCoreBuild<cr>', opts)
 end
 
 -- Create keymaps for debugging
@@ -201,35 +214,84 @@ function M.create_debug_keymaps(leader, mappings)
   vim.keymap.set('n', '<F5>', '<cmd>lua require("dotnet-core.debug").continue()<cr>', opts)
 end
 
--- Create buffer-local keymaps for .NET files
+-- Create buffer-local keymaps for .NET files (Visual Studio style)
 function M.setup_buffer_keymaps(bufnr)
   local opts = { noremap = true, silent = true, buffer = bufnr, desc = "" }
-  
-  -- Quick access to common .NET operations
-  opts.desc = "Quick build"
-  vim.keymap.set('n', '<F6>', '<cmd>DotnetCoreBuild<cr>', opts)
-  
-  opts.desc = "Quick run"
+
+  -- === VISUAL STUDIO STYLE KEYBINDINGS ===
+
+  -- Build & Run (Visual Studio defaults)
+  opts.desc = "Start Debugging/Run (VS: F5)"
   vim.keymap.set('n', '<F5>', '<cmd>DotnetCoreRun<cr>', opts)
-  
-  opts.desc = "Quick test"
-  vim.keymap.set('n', '<C-F5>', '<cmd>DotnetCoreTest<cr>', opts)
-  
-  -- LSP shortcuts
-  opts.desc = "Go to definition"
-  vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
-  
-  opts.desc = "Find references"
-  vim.keymap.set('n', 'gr', '<cmd>DotnetCoreFindReferences<cr>', opts)
-  
-  opts.desc = "Go to implementation"
-  vim.keymap.set('n', 'gi', '<cmd>DotnetCoreGoToImplementation<cr>', opts)
-  
-  opts.desc = "Rename symbol"
-  vim.keymap.set('n', '<F2>', '<cmd>DotnetCoreRename<cr>', opts)
-  
-  opts.desc = "Show code actions"
-  vim.keymap.set('n', '<leader>.', '<cmd>DotnetCoreCodeAction<cr>', opts)
+
+  opts.desc = "Start Without Debugging (VS: Ctrl+F5)"
+  vim.keymap.set('n', '<C-F5>', '<cmd>DotnetCoreRun<cr>', opts)
+
+  opts.desc = "Build Solution (VS: F6)"
+  vim.keymap.set('n', '<F6>', '<cmd>DotnetCoreBuild<cr>', opts)
+
+  opts.desc = "Build Solution (VS: Ctrl+Shift+B)"
+  vim.keymap.set('n', '<C-S-B>', '<cmd>DotnetCoreBuild<cr>', opts)
+
+  -- Navigation (Visual Studio defaults)
+  opts.desc = "Go to Definition (VS: F12)"
+  vim.keymap.set('n', '<F12>', function() vim.lsp.buf.definition() end, opts)
+
+  opts.desc = "Go to Implementation (VS: Ctrl+F12)"
+  vim.keymap.set('n', '<C-F12>', function() vim.lsp.buf.implementation() end, opts)
+
+  opts.desc = "Find All References (VS: Shift+F12)"
+  vim.keymap.set('n', '<S-F12>', function() vim.lsp.buf.references() end, opts)
+
+  opts.desc = "Rename Symbol (VS: F2)"
+  vim.keymap.set('n', '<F2>', function() vim.lsp.buf.rename() end, opts)
+
+  opts.desc = "Quick Actions/Code Actions (VS: Ctrl+.)"
+  vim.keymap.set('n', '<C-.>', function() vim.lsp.buf.code_action() end, opts)
+
+  opts.desc = "Quick Info/Hover (VS: Ctrl+K, Ctrl+I) - Alternative: Ctrl+H"
+  vim.keymap.set('n', '<C-h>', function() vim.lsp.buf.hover() end, opts)
+
+  opts.desc = "Parameter Info (VS: Ctrl+Shift+Space)"
+  vim.keymap.set('n', '<C-S-Space>', function() vim.lsp.buf.signature_help() end, opts)
+
+  -- Debugging (Visual Studio defaults)
+  opts.desc = "Toggle Breakpoint (VS: F9)"
+  vim.keymap.set('n', '<F9>', '<cmd>DotnetCoreDebugToggleBreakpoint<cr>', opts)
+
+  opts.desc = "Step Over (VS: F10)"
+  vim.keymap.set('n', '<F10>', '<cmd>lua require("dotnet-core.debug").step_over()<cr>', opts)
+
+  opts.desc = "Step Into (VS: F11)"
+  vim.keymap.set('n', '<F11>', '<cmd>lua require("dotnet-core.debug").step_into()<cr>', opts)
+
+  opts.desc = "Step Out (VS: Shift+F11)"
+  vim.keymap.set('n', '<S-F11>', '<cmd>lua require("dotnet-core.debug").step_out()<cr>', opts)
+
+  -- === NEOVIM TRADITIONAL KEYBINDINGS (for compatibility) ===
+
+  opts.desc = "Go to definition (Neovim: gd)"
+  vim.keymap.set('n', 'gd', function() vim.lsp.buf.definition() end, opts)
+
+  opts.desc = "Find references (Neovim: gr)"
+  vim.keymap.set('n', 'gr', function() vim.lsp.buf.references() end, opts)
+
+  opts.desc = "Go to implementation (Neovim: gi)"
+  vim.keymap.set('n', 'gi', function() vim.lsp.buf.implementation() end, opts)
+
+  opts.desc = "Hover information (Neovim: K)"
+  vim.keymap.set('n', 'K', function() vim.lsp.buf.hover() end, opts)
+
+  -- === ADDITIONAL USEFUL KEYBINDINGS ===
+
+  opts.desc = "Run Tests"
+  vim.keymap.set('n', '<C-T>', '<cmd>DotnetCoreTest<cr>', opts)
+
+  opts.desc = "Solution Explorer (VS: Ctrl+Alt+L) - Alternative: Ctrl+E"
+  vim.keymap.set('n', '<C-e>', '<cmd>DotnetCoreSolutionExplorer<cr>', opts)
+
+  opts.desc = "Format Document (VS: Ctrl+K, Ctrl+D) - Alternative: Ctrl+F"
+  vim.keymap.set('n', '<C-f>', function() vim.lsp.buf.format({ async = true }) end, opts)
 end
 
 -- Setup autocommands for buffer-local keymaps

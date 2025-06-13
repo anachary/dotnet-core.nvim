@@ -61,6 +61,7 @@ local default_config = {
   keymaps = {
     enable_default = true,
     leader = "<leader>", -- Direct leader access for speed
+    visual_studio_style = true, -- Enable Visual Studio-style keybindings for C# files
     mappings = {
       -- Single key shortcuts (super fast!)
       build = "b",           -- <leader>b - Build (most common)

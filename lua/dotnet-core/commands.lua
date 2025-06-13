@@ -157,6 +157,38 @@ function M.create_commands()
       return paths
     end
   })
+
+  -- Health check command
+  vim.api.nvim_create_user_command('DotnetCoreHealth', function()
+    M.health_check()
+  end, { desc = 'Check dotnet-core.nvim health and configuration' })
+
+  -- LSP status command
+  vim.api.nvim_create_user_command('DotnetCoreLspStatus', function()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local clients = vim.lsp.get_clients({ bufnr = bufnr })
+
+    if #clients == 0 then
+      print("❌ No LSP clients attached to current buffer")
+      print("💡 Install a C# language server:")
+      print("   • OmniSharp: :MasonInstall omnisharp")
+      print("   • csharp-ls: cargo install csharp-ls")
+      print("   • Roslyn: Install Microsoft.CodeAnalysis.LanguageServer")
+      print("   • Then restart Neovim and open a .cs file")
+    else
+      print("✅ LSP clients attached:")
+      for _, client in ipairs(clients) do
+        print("   • " .. client.name)
+        if client.server_capabilities then
+          print("     - Definition: " .. (client.server_capabilities.definitionProvider and "✅" or "❌"))
+          print("     - Implementation: " .. (client.server_capabilities.implementationProvider and "✅" or "❌"))
+          print("     - References: " .. (client.server_capabilities.referencesProvider and "✅" or "❌"))
+          print("     - Hover: " .. (client.server_capabilities.hoverProvider and "✅" or "❌"))
+          print("     - Rename: " .. (client.server_capabilities.renameProvider and "✅" or "❌"))
+        end
+      end
+    end
+  end, { desc = 'Check LSP server status for current buffer' })
 end
 
 -- Create a new .NET project
@@ -306,6 +338,81 @@ function M.get_project_templates()
     "nunit",
     "mstest"
   }
+end
+
+-- Health check function
+function M.health_check()
+  print("🔍 dotnet-core.nvim Health Check")
+  print("================================")
+
+  -- Check .NET CLI
+  local dotnet_ok = utils.command_exists("dotnet")
+  print("📦 .NET CLI: " .. (dotnet_ok and "✅ Available" or "❌ Not found"))
+
+  -- Check C# language servers
+  print("\n🔧 C# Language Servers:")
+  local omnisharp_ok = utils.command_exists("omnisharp")
+  local csharp_ls_ok = utils.command_exists("csharp-ls")
+  local roslyn_ok = utils.command_exists("Microsoft.CodeAnalysis.LanguageServer")
+
+  print("   • OmniSharp: " .. (omnisharp_ok and "✅ Available" or "❌ Not found"))
+  print("   • csharp-ls: " .. (csharp_ls_ok and "✅ Available" or "❌ Not found"))
+  print("   • Roslyn: " .. (roslyn_ok and "✅ Available" or "❌ Not found"))
+
+  if not (omnisharp_ok or csharp_ls_ok or roslyn_ok) then
+    print("\n💡 Install a C# language server:")
+    print("   • OmniSharp: :MasonInstall omnisharp")
+    print("   • csharp-ls: cargo install csharp-ls")
+    print("   • Roslyn: Install Microsoft.CodeAnalysis.LanguageServer")
+  end
+
+  -- Check current buffer LSP status
+  local bufnr = vim.api.nvim_get_current_buf()
+  local filetype = vim.api.nvim_buf_get_option(bufnr, 'filetype')
+  local clients = vim.lsp.get_clients({ bufnr = bufnr })
+
+  print("\n📄 Current Buffer:")
+  print("   • File type: " .. filetype)
+  print("   • LSP clients: " .. #clients)
+
+  if filetype == "cs" or filetype == "fs" or filetype == "vb" then
+    if #clients > 0 then
+      print("   • Status: ✅ LSP working")
+      for _, client in ipairs(clients) do
+        print("     - " .. client.name)
+      end
+    else
+      print("   • Status: ❌ LSP not attached")
+      print("   • Try: :DotnetCoreLspStatus for more info")
+    end
+  else
+    print("   • Status: ℹ️  Not a .NET file")
+  end
+
+  -- Check project detection
+  local dotnet = require('dotnet-core.dotnet')
+  local project_info = dotnet.get_project_info()
+
+  print("\n🏗️  Project Detection:")
+  print("   • Project found: " .. (project_info.has_project and "✅ Yes" or "❌ No"))
+  if project_info.has_project then
+    print("   • Project file: " .. project_info.project)
+    print("   • Solution: " .. (project_info.has_solution and "✅ Yes" or "❌ No"))
+  end
+
+  print("\n🎯 Recommendations:")
+  if not dotnet_ok then
+    print("   1. Install .NET SDK from https://dotnet.microsoft.com/")
+  end
+  if not (omnisharp_ok or csharp_ls_ok or roslyn_ok) then
+    print("   2. Install a C# language server (see above)")
+  end
+  if filetype == "cs" and #clients == 0 then
+    print("   3. Restart Neovim after installing language server")
+  end
+  if not project_info.has_project then
+    print("   4. Open a .NET project directory or create one with :DotnetCoreNewProject")
+  end
 end
 
 return M

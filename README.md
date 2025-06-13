@@ -348,10 +348,39 @@ require("dotnet-core").setup({
 ### Utility (Single Key)
 - `<leader>h` - **H**ealth check
 
-### Quick Actions
-- `<F5>` - Run project (buffer-local)
-- `<F6>` - Build project (buffer-local)
-- `<Ctrl-F5>` - Run tests (buffer-local)
+### Quick Actions (Visual Studio Style)
+**Build & Run:**
+- `<F5>` - Start Debugging/Run (VS style)
+- `<Ctrl+F5>` - Start Without Debugging (VS style)
+- `<F6>` - Build Solution (VS style)
+- `<Ctrl+Shift+B>` - Build Solution (VS style)
+
+**Navigation:**
+- `<F12>` - Go to Definition (VS style)
+- `<Ctrl+F12>` - Go to Implementation (VS style)
+- `<Shift+F12>` - Find All References (VS style)
+- `<F2>` - Rename Symbol (VS style)
+- `<Ctrl+.>` - Quick Actions/Code Actions (VS style)
+
+**Information:**
+- `<Ctrl+H>` - Quick Info/Hover (VS: Ctrl+K, Ctrl+I alternative)
+- `<Ctrl+Shift+Space>` - Parameter Info (VS style)
+
+**Debugging:**
+- `<F9>` - Toggle Breakpoint (VS style)
+- `<F10>` - Step Over (VS style)
+- `<F11>` - Step Into (VS style)
+- `<Shift+F11>` - Step Out (VS style)
+
+**Solution Management:**
+- `<Ctrl+E>` - Solution Explorer (VS: Ctrl+Alt+L alternative)
+- `<Ctrl+F>` - Format Document (VS: Ctrl+K, Ctrl+D alternative)
+
+### Traditional Neovim Keybindings (also available)
+- `gd` - Go to definition
+- `gi` - Go to implementation
+- `gr` - Find references
+- `K` - Hover information
 
 ## Project Templates
 
@@ -436,14 +465,24 @@ Expected output:
 2. Ensure `require("dotnet-core").setup()` is called in your config
 3. Restart Neovim completely
 
-#### LSP not working
-**Symptoms**: No autocomplete, go-to-definition, or error highlighting
+#### LSP not working (gd, gi, gr not working)
+**Symptoms**: No autocomplete, go-to-definition, implementation, or references
 
-**Solutions**:
-1. Check if OmniSharp is installed: `:MasonInstall omnisharp`
+**Quick Fix**:
+1. **Install a C# Language Server**: `:MasonInstall omnisharp`
+2. **Check status**: `:DotnetCoreLspStatus`
+3. **Restart Neovim** and open a `.cs` file
+
+**Detailed Solutions**:
+1. Install language server options:
+   - OmniSharp: `:MasonInstall omnisharp`
+   - csharp-ls: `cargo install csharp-ls`
+   - Roslyn: Download from Microsoft
 2. Verify file type: `:set filetype?` (should be `cs`)
-3. Check LSP status: `:LspInfo`
+3. Check LSP status: `:LspInfo` or `:DotnetCoreLspStatus`
 4. Restart LSP: `:LspRestart`
+
+📖 **See [LSP_SETUP_GUIDE.md](LSP_SETUP_GUIDE.md) for detailed instructions**
 
 #### Commands not found
 **Error**: `E492: Not an editor command: DotnetCoreBuild`

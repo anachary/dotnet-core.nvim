@@ -40,54 +40,43 @@ function M.setup(lsp_config)
   -- Configure based on server type
   if server_type == "roslyn" then
     server_config = M.get_roslyn_config(lsp_config)
+    server_config.capabilities = capabilities
+    server_config.on_attach = M.on_attach
     lspconfig.roslyn.setup(server_config)
     utils.info("LSP configuration loaded for Roslyn Language Server")
   elseif server_type == "csharp_ls" then
     server_config = M.get_csharp_ls_config(lsp_config)
+    server_config.capabilities = capabilities
+    server_config.on_attach = M.on_attach
     lspconfig.csharp_ls.setup(server_config)
     utils.info("LSP configuration loaded for csharp-ls")
   elseif server_type == "omnisharp" then
     server_config = config.get_lsp_config()
+    server_config.capabilities = capabilities
+    server_config.on_attach = M.on_attach
     lspconfig.omnisharp.setup(server_config)
     utils.info("LSP configuration loaded for OmniSharp")
   end
-
-  -- Add common configuration
-  server_config.capabilities = capabilities
-  server_config.on_attach = M.on_attach
 end
 
 -- Enhanced on_attach function for .NET Core specific features
 function M.on_attach(client, bufnr)
   lsp_client_id = client.id
   lsp_attached_buffers[bufnr] = true
-  
+
   -- Enable completion triggered by <c-x><c-o>
   vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-  
-  -- Buffer-local mappings for LSP functions
+
+  -- Only set up diagnostics keymaps here (navigation keymaps are handled by keymaps.lua)
   local opts = { noremap = true, silent = true, buffer = bufnr }
-  
-  -- Navigation
-  vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-  vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-  vim.keymap.set('n', 'gi', M.go_to_implementation, opts)
-  vim.keymap.set('n', 'gr', M.find_references, opts)
-  vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-  vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-  
-  -- Code actions and refactoring
-  vim.keymap.set('n', '<leader>ca', M.code_action, opts)
-  vim.keymap.set('n', '<leader>rn', M.rename, opts)
-  vim.keymap.set('n', '<leader>f', function() vim.lsp.buf.format { async = true } end, opts)
-  
-  -- Diagnostics
+
+  -- Diagnostics navigation
   vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
   vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
   vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, opts)
   vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, opts)
-  
-  utils.info("LSP attached to buffer " .. bufnr)
+
+  utils.info("LSP attached to buffer " .. bufnr .. " (" .. client.name .. ")")
 end
 
 -- Enhanced go to definition with .NET Core specific handling
