@@ -100,6 +100,74 @@ local default_config = {
     auto_detect_startup_project = true, -- Automatically detect executable projects as startup
     startup_project = nil, -- Path to the startup project (auto-detected or manually set)
   },
+
+  -- Solution Explorer configuration
+  solution_explorer = {
+    -- Layout options: "floating", "side", "split"
+    layout = "floating",
+
+    -- Position for side layout: "left", "right"
+    side_position = "left",
+
+    -- Size configuration
+    size = {
+      width = 0.3,  -- 30% of screen width (floating/side)
+      height = 0.8, -- 80% of screen height (floating)
+      min_width = 30,
+      min_height = 10,
+    },
+
+    -- Display options
+    display = {
+      show_file_tree = true,
+      show_project_details = true,
+      show_dependencies = true,
+      show_startup_marker = true,
+      compact_mode = false,
+      auto_expand_projects = false,
+      max_depth = 3, -- Maximum folder depth to show
+    },
+
+    -- Behavior options
+    behavior = {
+      auto_close_on_select = false,
+      auto_refresh = true,
+      follow_current_file = false,
+      remember_position = true,
+    },
+
+    -- Custom icons (can override UI icons)
+    icons = {
+      solution = "📁",
+      project = "📦",
+      folder = "📂",
+      file = "📄",
+      cs_file = "🔷",
+      test_file = "🧪",
+      config_file = "⚙️",
+      startup_marker = "⭐",
+      expanded = "▼",
+      collapsed = "▶",
+    },
+
+    -- Keymaps (customizable)
+    keymaps = {
+      close = { "q", "<Esc>" },
+      refresh = "r",
+      open = { "<CR>", "o" },
+      expand_collapse = "<Space>",
+      build_project = "b",
+      run_project = "R",
+      set_startup = "s",
+      show_details = "i",
+      toggle_hidden = "H",
+      search = "/",
+      goto_file = "gf",
+      new_file = "a",
+      delete_file = "d",
+      rename_file = "m",
+    },
+  },
 }
 
 -- Plugin state

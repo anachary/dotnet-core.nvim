@@ -84,10 +84,32 @@ function M.create_commands()
   vim.api.nvim_create_user_command('DotnetCoreSolutionExplorer', function()
     require('dotnet-core.project').solution_explorer()
   end, { desc = 'Open solution explorer' })
-  
+
   vim.api.nvim_create_user_command('DotnetCoreProjectStructure', function()
     require('dotnet-core.project').show_structure()
   end, { desc = 'Show project structure' })
+
+  -- Solution explorer layout configuration
+  vim.api.nvim_create_user_command('DotnetCoreExplorerLayout', function(opts)
+    local layout = opts.args
+    if layout == "" then
+      vim.ui.select({"floating", "side", "split"}, {
+        prompt = "Select solution explorer layout:",
+      }, function(choice)
+        if choice then
+          M.set_explorer_layout(choice)
+        end
+      end)
+    else
+      M.set_explorer_layout(layout)
+    end
+  end, {
+    desc = 'Configure solution explorer layout (floating/side/split)',
+    nargs = '?',
+    complete = function()
+      return {"floating", "side", "split"}
+    end
+  })
   
   -- New project commands
   vim.api.nvim_create_user_command('DotnetCoreNewProject', function(opts)
@@ -413,6 +435,24 @@ function M.health_check()
   if not project_info.has_project then
     print("   4. Open a .NET project directory or create one with :DotnetCoreNewProject")
   end
+end
+
+-- Set explorer layout
+function M.set_explorer_layout(layout)
+  local valid_layouts = { "floating", "side", "split" }
+
+  if not vim.tbl_contains(valid_layouts, layout) then
+    vim.notify("Invalid layout: " .. layout .. ". Valid options: " .. table.concat(valid_layouts, ", "), vim.log.levels.ERROR)
+    return
+  end
+
+  -- Update configuration
+  local config = require('dotnet-core.config')
+  local current_config = config.get("solution_explorer", {})
+  current_config.layout = layout
+
+  vim.notify("Solution Explorer layout set to: " .. layout, vim.log.levels.INFO)
+  vim.notify("Use :DotnetCoreSolutionExplorer to see the new layout", vim.log.levels.INFO)
 end
 
 return M

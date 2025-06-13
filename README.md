@@ -410,13 +410,33 @@ The solution explorer provides a tree view of your .NET solution:
 - 🔗 **Project References** - Inter-project dependencies
 - 📄 **Source Files** - C#, F#, VB.NET files
 
-### Explorer Keybindings
-- `<CR>` or `o` - Open item under cursor
+### Explorer Navigation & Selection
+**Opening Items:**
+- `<CR>` or `o` - Smart open (projects → .csproj, files → editor, directories → expand/collapse)
+- `<Space>` - Expand/collapse directories
+- `gf` - Go to current file in explorer
+
+**Project Operations:**
 - `b` - Build project under cursor
 - `R` - Run project under cursor (if executable)
 - `s` - Set project under cursor as startup project
+
+**File Operations:**
+- `a` - Create new file in selected directory/project
+- `d` - Delete file under cursor
+- `m` - Rename file under cursor
+
+**Navigation & View:**
 - `r` - Refresh explorer
+- `i` - Show item details
+- `H` - Toggle hidden files
+- `/` - Search/filter items
 - `q` or `<Esc>` - Close explorer
+
+**Layout Options:**
+- `:DotnetCoreExplorerLayout floating` - Floating window
+- `:DotnetCoreExplorerLayout side` - Side panel
+- `:DotnetCoreExplorerLayout split` - Horizontal split
 
 ## 🚀 Startup Project Management
 
