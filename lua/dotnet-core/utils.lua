@@ -4,17 +4,32 @@ local M = {}
 
 -- Check if a command exists in the system
 function M.command_exists(cmd)
-  local handle = io.popen("where " .. cmd .. " 2>nul") -- Windows
-  if not handle then
-    handle = io.popen("which " .. cmd .. " 2>/dev/null") -- Unix-like
+  -- Try to execute the command with --version or --help to see if it exists
+  local test_command
+  if cmd == "dotnet" then
+    test_command = "dotnet --version 2>&1"
+  elseif cmd == "omnisharp" then
+    test_command = "omnisharp --help 2>&1"
+  else
+    -- Fallback to where/which
+    if vim.fn.has("win32") == 1 then
+      test_command = "where " .. cmd .. " 2>nul"
+    else
+      test_command = "which " .. cmd .. " 2>/dev/null"
+    end
   end
-  
+
+  local handle = io.popen(test_command)
   if handle then
     local result = handle:read("*a")
     handle:close()
-    return result ~= ""
+    -- For dotnet, check if we got a version number
+    if cmd == "dotnet" then
+      return result ~= nil and result ~= "" and not result:match("not recognized") and not result:match("command not found")
+    end
+    return result ~= nil and result ~= ""
   end
-  
+
   return false
 end
 

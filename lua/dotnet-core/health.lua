@@ -3,45 +3,79 @@
 local M = {}
 local utils = require('dotnet-core.utils')
 
+-- Health API wrapper for compatibility
+local function get_health_api()
+  local health = vim.health
+  if not health then
+    health = require('health')
+  end
+
+  -- Create a unified API
+  return {
+    start = health.start or health.report_start,
+    ok = health.ok or health.report_ok,
+    warn = health.warn or health.report_warn,
+    error = health.error or health.report_error,
+    info = health.info or health.report_info,
+  }
+end
+
 -- Perform comprehensive health check
 function M.check()
-  local health = vim.health or require('health')
-  
-  health.report_start("dotnet-core.nvim Health Check")
-  
+  -- Simple health check for testing
+  print("=== dotnet-core.nvim Health Check ===")
+
   -- Check Neovim version
-  M.check_neovim_version(health)
-  
+  if vim.fn.has('nvim-0.8.0') == 1 then
+    print("✅ Neovim version is compatible (>= 0.8.0)")
+  else
+    print("❌ Neovim version is too old. Requires >= 0.8.0")
+  end
+
   -- Check .NET Core SDK
-  M.check_dotnet_sdk(health)
-  
-  -- Check OmniSharp
-  M.check_omnisharp(health)
-  
+  if utils.command_exists("dotnet") then
+    print("✅ .NET Core SDK found")
+  else
+    print("❌ .NET Core SDK not found")
+  end
+
   -- Check LSP configuration
-  M.check_lsp_config(health)
-  
-  -- Check optional dependencies
-  M.check_optional_dependencies(health)
-  
+  local has_lspconfig, _ = pcall(require, 'lspconfig')
+  if has_lspconfig then
+    print("✅ nvim-lspconfig is available")
+  else
+    print("❌ nvim-lspconfig not found")
+  end
+
   -- Check current project
-  M.check_current_project(health)
-  
-  -- Check plugin configuration
-  M.check_plugin_config(health)
+  local cwd = vim.fn.getcwd()
+  local proj_files = utils.find_files(cwd, "*.csproj")
+  local sln_files = utils.find_files(cwd, "*.sln")
+
+  if #proj_files > 0 or #sln_files > 0 then
+    print("✅ .NET project found in current directory")
+    if #sln_files > 0 then
+      print("  - Found " .. #sln_files .. " solution file(s)")
+    end
+    if #proj_files > 0 then
+      print("  - Found " .. #proj_files .. " C# project file(s)")
+    end
+  else
+    print("ℹ️  No .NET projects found in current directory")
+  end
+
+  print("=== Health Check Complete ===")
 end
 
 -- Check Neovim version compatibility
-function M.check_neovim_version(health)
-  health.report_start("Neovim Version")
-  
+function M.check_neovim_version()
+  local health = get_health_api()
+  health.start("Neovim Version")
+
   if vim.fn.has('nvim-0.8.0') == 1 then
-    health.report_ok("Neovim version is compatible (>= 0.8.0)")
+    health.ok("Neovim version is compatible (>= 0.8.0)")
   else
-    health.report_error("Neovim version is too old. Requires >= 0.8.0", {
-      "Please update Neovim to version 0.8.0 or later",
-      "Visit: https://github.com/neovim/neovim/releases"
-    })
+    health.error("Neovim version is too old. Requires >= 0.8.0")
   end
 end
 

@@ -2,7 +2,7 @@
 
 A comprehensive Neovim plugin that provides Visual Studio-like functionality specifically for .NET Core development, with a focus on superior user experience and keyboard-driven workflow.
 
-[![LuaRocks](https://img.shields.io/luarocks/v/GustavEikaas/dotnet-core.nvim?logo=lua&color=purple)](https://luarocks.org/modules/GustavEikaas/dotnet-core.nvim)
+[![LuaRocks](https://img.shields.io/luarocks/v/anachary/dotnet-core.nvim?logo=lua&color=purple)](https://luarocks.org/modules/anachary/dotnet-core.nvim)
 
 ## 🚦 Implementation Status
 
@@ -82,7 +82,7 @@ A comprehensive Neovim plugin that provides Visual Studio-like functionality spe
 
 ```lua
 {
-  "GustavEikaas/dotnet-core.nvim",
+  "anachary/dotnet-core.nvim",
   dependencies = { "neovim/nvim-lspconfig" },
   config = function()
     require("dotnet-core").setup()
@@ -94,7 +94,7 @@ A comprehensive Neovim plugin that provides Visual Studio-like functionality spe
 
 ```lua
 use {
-  "GustavEikaas/dotnet-core.nvim",
+  "anachary/dotnet-core.nvim",
   requires = { "neovim/nvim-lspconfig" },
   config = function()
     require("dotnet-core").setup()
@@ -106,7 +106,7 @@ use {
 
 ```vim
 Plug 'neovim/nvim-lspconfig'
-Plug 'GustavEikaas/dotnet-core.nvim'
+Plug 'anachary/dotnet-core.nvim'
 
 " In your init.vim or init.lua
 lua require("dotnet-core").setup()
@@ -497,8 +497,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Support
 
-- 🐛 **Issues**: [GitHub Issues](https://github.com/GustavEikaas/dotnet-core.nvim/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/GustavEikaas/dotnet-core.nvim/discussions)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/anachary/dotnet-core.nvim/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/anachary/dotnet-core.nvim/discussions)
 - 📖 **Documentation**: `:help dotnet-core`
 - 🏥 **Health Check**: `:DotnetCoreHealth`
 
