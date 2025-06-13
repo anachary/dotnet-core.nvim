@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+          
+      - name: Setup Luarocks
+        uses: leafo/gh-actions-luarocks@v4
+        
+      - name: Install luacheck
+        run: luarocks install luacheck
+        
+      - name: Run luacheck
+        run: luacheck lua/ --globals vim
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        neovim-version: ['v0.8.0', 'v0.9.0', 'nightly']
+    
+    name: Test on ${{ matrix.os }} with Neovim ${{ matrix.neovim-version }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+          
+      - name: Setup Neovim
+        uses: rhymond/setup-neovim@v1
+        with:
+          neovim-version: ${{ matrix.neovim-version }}
+          
+      - name: Verify .NET installation
+        run: dotnet --version
+        
+      - name: Verify Neovim installation
+        run: nvim --version
+        
+      - name: Test plugin loading
+        run: |
+          nvim --headless -c "lua require('dotnet-core').setup()" -c "quit"
+
+  documentation:
+    runs-on: ubuntu-latest
+    name: Check Documentation
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Neovim
+        uses: rhymond/setup-neovim@v1
+        with:
+          neovim-version: 'stable'
+          
+      - name: Validate help tags
+        run: |
+          nvim --headless -c "helptags doc/" -c "quit"

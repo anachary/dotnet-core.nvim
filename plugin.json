@@ -1,0 +1,50 @@
+{
+  "name": "dotnet-core.nvim",
+  "version": "1.0.0",
+  "description": "Comprehensive .NET Core development plugin for Neovim with Visual Studio-like functionality",
+  "author": "GustavEikaas",
+  "license": "MIT",
+  "homepage": "https://github.com/GustavEikaas/dotnet-core.nvim",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GustavEikaas/dotnet-core.nvim.git"
+  },
+  "keywords": [
+    "neovim",
+    "nvim",
+    "plugin",
+    "dotnet",
+    "csharp",
+    "lsp",
+    "omnisharp",
+    "development",
+    "ide"
+  ],
+  "engines": {
+    "neovim": ">=0.8.0"
+  },
+  "dependencies": {
+    "required": [
+      "neovim/nvim-lspconfig"
+    ],
+    "optional": [
+      "nvim-telescope/telescope.nvim",
+      "mfussenegger/nvim-dap"
+    ]
+  },
+  "features": [
+    "LSP integration with OmniSharp/Roslyn",
+    "Dotnet CLI integration (build, run, test, restore, clean)",
+    "Solution explorer and project management",
+    "Enhanced code navigation and refactoring",
+    "NuGet package management",
+    "Project template creation",
+    "Comprehensive health check system",
+    "Customizable keybinding system"
+  ],
+  "categories": [
+    "Language Support",
+    "IDE Features",
+    "Development Tools"
+  ]
+}

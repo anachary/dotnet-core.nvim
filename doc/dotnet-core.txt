@@ -1,0 +1,217 @@
+*dotnet-core.txt*    .NET Core development plugin for Neovim
+
+                    DOTNET-CORE.NVIM DOCUMENTATION
+
+Author: Augment Agent
+License: MIT
+Version: 1.0.0
+
+==============================================================================
+CONTENTS                                                    *dotnet-core-contents*
+
+1. Introduction ............................ |dotnet-core-introduction|
+2. Installation ............................ |dotnet-core-installation|
+3. Configuration ........................... |dotnet-core-configuration|
+4. Commands ................................ |dotnet-core-commands|
+5. Keybindings ............................. |dotnet-core-keybindings|
+6. LSP Integration ......................... |dotnet-core-lsp|
+7. Project Management ...................... |dotnet-core-project|
+8. Debugging ............................... |dotnet-core-debugging|
+9. Health Check ............................ |dotnet-core-health|
+10. FAQ .................................... |dotnet-core-faq|
+
+==============================================================================
+1. INTRODUCTION                                         *dotnet-core-introduction*
+
+dotnet-core.nvim is a comprehensive Neovim plugin that provides Visual Studio-like
+functionality specifically for .NET Core development. It focuses on superior user
+experience and keyboard-driven workflow.
+
+Features:
+- LSP integration with OmniSharp/Roslyn
+- Integrated dotnet CLI commands
+- Solution explorer and project management
+- Enhanced code navigation and refactoring
+- Debugging support (planned)
+- Keyboard-first design
+
+==============================================================================
+2. INSTALLATION                                         *dotnet-core-installation*
+
+Prerequisites:
+- Neovim >= 0.8.0
+- .NET Core SDK
+- OmniSharp language server (recommended)
+
+Using lazy.nvim: >
+    {
+      "your-username/dotnet-core.nvim",
+      dependencies = {
+        "neovim/nvim-lspconfig",
+        "nvim-telescope/telescope.nvim", -- Optional
+        "mfussenegger/nvim-dap",        -- Optional
+      },
+      config = function()
+        require("dotnet-core").setup()
+      end,
+    }
+<
+
+==============================================================================
+3. CONFIGURATION                                       *dotnet-core-configuration*
+
+Default configuration: >
+    require("dotnet-core").setup({
+      lsp = {
+        omnisharp = {
+          cmd = { "omnisharp", "--languageserver", "--hostPID", tostring(vim.fn.getpid()) },
+          enable_roslyn_analyzers = true,
+          enable_import_completion = true,
+          organize_imports_on_format = true,
+          enable_decompilation_support = true,
+        },
+      },
+      dotnet = {
+        auto_restore = true,
+        build_on_save = false,
+        test_on_save = false,
+        default_configuration = "Debug",
+      },
+      keymaps = {
+        enable_default = true,
+        leader = "<leader>d",
+      },
+    })
+<
+
+==============================================================================
+4. COMMANDS                                                *dotnet-core-commands*
+
+Project Management:
+*:DotnetCoreNewProject* [template]    Create a new .NET project
+*:DotnetCoreNewSolution* [name]       Create a new .NET solution
+*:DotnetCoreSolutionExplorer*         Open solution explorer
+*:DotnetCoreProjectStructure*         Show detailed project structure
+
+Build & Run:
+*:DotnetCoreBuild* [config]           Build project/solution
+*:DotnetCoreRun* [config]             Run the project
+*:DotnetCoreTest* [config]            Run tests
+*:DotnetCoreRestore*                  Restore NuGet packages
+*:DotnetCoreClean* [config]           Clean build artifacts
+
+Code Navigation & LSP:
+*:DotnetCoreFindReferences*           Find all references to symbol
+*:DotnetCoreGoToImplementation*       Go to implementation
+*:DotnetCoreRename*                   Rename symbol
+*:DotnetCoreCodeAction*               Show available code actions
+
+Package Management:
+*:DotnetCoreAddPackage* <name>        Add NuGet package
+*:DotnetCoreRemovePackage* <name>     Remove NuGet package
+
+Utility:
+*:DotnetCoreHealth*                   Check plugin health
+*:DotnetCoreSetup*                    Reinitialize plugin
+
+==============================================================================
+5. KEYBINDINGS                                          *dotnet-core-keybindings*
+
+Default leader: `<leader>d`
+
+Build & Run:
+`<leader>db`    Build project/solution
+`<leader>dr`    Run project
+`<leader>dt`    Run tests
+`<leader>dR`    Restore packages
+`<leader>dc`    Clean
+
+Code Navigation:
+`<leader>dfr`   Find references
+`<leader>dgi`   Go to implementation
+`<leader>drn`   Rename symbol
+`<leader>dca`   Code actions
+
+Project Management:
+`<leader>dse`   Solution explorer
+`<leader>dps`   Project structure
+
+Buffer-local (in .NET files):
+`gd`            Go to definition
+`gr`            Find references
+`gi`            Go to implementation
+`<F2>`          Rename
+`<F5>`          Run project
+`<F6>`          Build project
+
+==============================================================================
+6. LSP INTEGRATION                                            *dotnet-core-lsp*
+
+The plugin integrates with OmniSharp language server to provide:
+- Code completion
+- Go to definition/implementation
+- Find references
+- Rename refactoring
+- Code actions and quick fixes
+- Diagnostics and error highlighting
+- Hover information
+- Signature help
+
+LSP features are automatically enabled when editing .NET files (*.cs, *.fs, *.vb).
+
+==============================================================================
+7. PROJECT MANAGEMENT                                      *dotnet-core-project*
+
+Solution Explorer:
+- Tree view of solution/project structure
+- Navigate to files and projects
+- Build/run individual projects
+- Package and reference management
+
+Project Templates:
+- console, classlib, web, webapi, mvc
+- blazorserver, blazorwasm, worker
+- winforms, wpf
+- xunit, nunit, mstest
+
+==============================================================================
+8. DEBUGGING                                              *dotnet-core-debugging*
+
+Debugging support is planned for future releases and will include:
+- Breakpoint management
+- Step debugging
+- Variable inspection
+- Call stack navigation
+- Debug console
+
+==============================================================================
+9. HEALTH CHECK                                             *dotnet-core-health*
+
+Run |:DotnetCoreHealth| to check:
+- Neovim version compatibility
+- .NET Core SDK installation
+- OmniSharp availability
+- LSP configuration
+- Optional dependencies
+- Current project detection
+
+==============================================================================
+10. FAQ                                                        *dotnet-core-faq*
+
+Q: OmniSharp not found, what should I do?
+A: Install OmniSharp using Mason (`:MasonInstall omnisharp`) or download from
+   the official GitHub releases.
+
+Q: LSP features not working?
+A: Check `:DotnetCoreHealth` and ensure OmniSharp is properly installed and
+   configured.
+
+Q: How to disable auto-restore?
+A: Set `dotnet.auto_restore = false` in your configuration.
+
+Q: Can I use custom keybindings?
+A: Yes, either disable default keybindings and create your own, or customize
+   the mappings in the configuration.
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
